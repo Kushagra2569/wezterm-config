@@ -71,7 +71,7 @@ config.keys = {
 
   -- Tab keybindings
   { key = "t", mods = "LEADER", action = act.SpawnTab("CurrentPaneDomain") },
-  { key = "J", mods = "LEADER", action = act.ActivateTabRelative(-1) },
+  { key = "H", mods = "LEADER", action = act.ActivateTabRelative(-1) },
   { key = "L", mods = "LEADER", action = act.ActivateTabRelative(1) },
   { key = "n", mods = "LEADER", action = act.ShowTabNavigator },
   {
@@ -240,6 +240,12 @@ wezterm.on("gui-startup", function()
   -- We want to startup in the coding workspace
   mux.set_active_workspace("main")
 end)
+
+config.unix_domains = {
+  {
+    name = "main",
+  },
+}
 
 --[[ Appearance setting for when I need to take pretty screenshots
 config.enable_tab_bar = false
