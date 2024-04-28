@@ -11,14 +11,23 @@ end
 -- Settings
 config.default_prog = { "pwsh.exe", "-NoLogo" }
 
-config.color_scheme = "Tokyo Night"
 config.font = wezterm.font_with_fallback({
   { family = "FiraCode Nerd Font", scale = 1 },
   { family = "FantasqueSansM Nerd Font", scale = 1.3 },
 })
-config.window_background_opacity = 0.9
+
+-- Window
+config.initial_rows = 45
+config.initial_cols = 180
+config.window_background_opacity = 0.6
+config.win32_system_backdrop = "Acrylic"
+config.max_fps = 144
+config.animation_fps = 60
+config.cursor_blink_rate = 250
+
 config.window_decorations = "INTEGRATED_BUTTONS|RESIZE"
 config.integrated_title_buttons = { "Close" }
+config.show_new_tab_button_in_tab_bar = false
 config.scrollback_lines = 3000
 config.skip_close_confirmation_for_processes_named = {
   "bash",
@@ -132,6 +141,25 @@ config.key_tables = {
 config.use_fancy_tab_bar = false
 config.status_update_interval = 1000
 config.tab_bar_at_bottom = false
+config.colors = {
+  foreground = "#ffffff",
+  background = "#16181a",
+
+  cursor_bg = "#ffffff",
+  cursor_fg = "#ffffff",
+  cursor_border = "#ffffff",
+
+  selection_fg = "#ffffff",
+  selection_bg = "#3c4048",
+
+  scrollbar_thumb = "#16181a",
+  split = "#16181a",
+
+  ansi = { "#16181a", "#ff6e5e", "#5eff6c", "#f1ff5e", "#5ea1ff", "#bd5eff", "#5ef1ff", "#ffffff" },
+  brights = { "#3c4048", "#ff6e5e", "#5eff6c", "#f1ff5e", "#5ea1ff", "#bd5eff", "#5ef1ff", "#ffffff" },
+  indexed = { [16] = "#ffbd5e", [17] = "#ff6e5e" },
+}
+
 wezterm.on("update-status", function(window, pane)
   -- Workspace name
   local stat = window:active_workspace()
@@ -197,6 +225,45 @@ wezterm.on("update-status", function(window, pane)
   }))
 end)
 
+local function tab_title(tab_info)
+  local title = tab_info.tab_title
+
+  if title and #title > 0 then
+    return title
+  end
+
+  return tab_info.active_pane.title
+end
+
+wezterm.on("format-tab-title", function(tab, tabs, panes, cf, hover, max_width)
+  local title = tab_title(tab)
+
+  title = wezterm.truncate_left(title, max_width)
+  local i = tab.tab_index + 1
+
+  title = string.format(" %d %s ", i, title)
+
+  local background = "rgb(22, 24, 26 / 30%)"
+  local foreground = "white"
+
+  if tab.is_active then
+    background = "rgb(22, 24, 26 / 75%)"
+    foreground = "white"
+  end
+
+  return {
+    { Background = { Color = "black" } },
+    { Foreground = { Color = "black" } },
+    { Text = "" },
+    { Background = { Color = background } },
+    { Foreground = { Color = foreground } },
+    { Text = title },
+    { Background = { Color = "black" } },
+    { Foreground = { Color = "black" } },
+    { Text = "" },
+  }
+end)
+
 wezterm.on("gui-startup", function()
   -- allow `wezterm start -- something` to affect what we spawn
   -- in our initial window
@@ -245,6 +312,13 @@ config.unix_domains = {
   {
     name = "main",
   },
+}
+
+config.window_padding = {
+  left = 0,
+  right = 0,
+  top = 0,
+  bottom = 0,
 }
 
 --[[ Appearance setting for when I need to take pretty screenshots
